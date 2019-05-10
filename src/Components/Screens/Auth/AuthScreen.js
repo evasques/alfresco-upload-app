@@ -6,6 +6,7 @@
 import React from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 import { Container, Header, Content, Form, Item, Input, Label, Button, Text } from 'native-base';
+import { AppLoading } from 'expo';
 
 // Screens
 import AbstractScreen from '@screens/AbstractScreen';
@@ -30,10 +31,10 @@ export default class AuthScreen extends AbstractScreen {
   constructor(props) {
     super(props);
 
-    this.state = {
+    this.initState({
       username: undefined,
       password: undefined
-    };
+    });
   }
 
   /**
@@ -49,10 +50,9 @@ export default class AuthScreen extends AbstractScreen {
    */
   render() {
 
-    if (this.state.loadingScreen) {
-      return <View />;
+    if (this.isLoadingScreen()) {
+      return <AppLoading />;
     }
-
 
     return (
       <Container style={styles.container}>

@@ -30,6 +30,16 @@ export default class AbstractScreen extends Component {
    /**
     *
     */
+   initState = (newState) => {
+     this.state = {
+       ...this.state,
+       ...newState
+     }
+   }
+
+   /**
+    *
+    */
    loadFontsAsync = async () => {
      await Font.loadAsync({
        'Roboto': require("native-base/Fonts/Roboto.ttf"),
@@ -39,12 +49,20 @@ export default class AbstractScreen extends Component {
      });
    }
 
+
+   /**
+    *
+    */
+   isLoadingScreen = () => {
+     return this.state.loadingScreen;
+   }
+
    /**
     *
     */
    setLoadingScreen = (flag) => {
      this.setState({
-       loadingScreen: flag
+       loadingScreen: flag && flag === true
      });
    }
 
