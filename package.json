@@ -7,8 +7,11 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "btoa": "^1.2.1",
     "expo": "^32.0.0",
+    "fs": "0.0.1-security",
     "native-base": "^2.12.1",
+    "path": "^0.12.7",
     "react": "16.5.0",
     "react-native": "https://github.com/expo/react-native/archive/sdk-32.0.0.tar.gz",
     "react-native-easy-grid": "^0.2.1",
