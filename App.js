@@ -1,9 +1,17 @@
 /****************************************************************************
- * Imports
+ * Imports, variables, constants
  ***************************************************************************/
 
+// ReactNative and external dependencies
 import React, { Component } from 'react';
-import { createAppContainer, createSwitchNavigator } from 'react-navigation';
+import { Platform } from 'react-native';
+import { createAppContainer, createSwitchNavigator, createBottomTabNavigator } from 'react-navigation';
+
+// Screens
+import AuthLoadingScreen from '@screens/Auth/AuthLoadingScreen';
+import AuthScreen from '@screens/Auth/AuthScreen';
+import HomeScreen from '@screens/App/HomeScreen';
+import SettingsScreen from '@screens/App/SettingsScreen';
 
 /****************************************************************************
  * App component
@@ -26,15 +34,62 @@ export default class App extends Component {
  ***************************************************************************/
 
 /**
+ * Application navigator containing the main options
+ */
+const AppNavigator = createBottomTabNavigator({
+
+   // First button
+   Home: {
+     screen: HomeScreen,
+     navigationOptions: ({ navigation }) => ({
+       tabBarIcon: ({ tintColor }) => (
+           <Icon name='home' type='Feather' style={{ fontSize: iconSize, color: tintColor }} />
+       )
+     })
+   },
+
+   // Second button
+   Settings: {
+     screen: SettingsScreen,
+     navigationOptions: ({ navigation }) => ({
+       tabBarIcon: ({ tintColor }) => (
+           <Icon name='hash' type='Feather' style={{ fontSize: iconSize, color: tintColor }} />
+       )
+     })
+   }
+ },
+ {
+   animationEnabled: true,
+   swipeEnabled: true,
+   tabBarPosition: "bottom",
+   tabBarOptions: {
+   style: {
+     ...Platform.select({
+       android: {
+         backgroundColor: 'white'
+       }
+     })
+   },
+   activeTintColor: 'blue',
+   inactiveTintColor: '#000000',
+   showLabel: false,
+   showIcon: true
+ }
+});
+
+/**
  * Authentication navigator
  */
 const AuthNavigator = createSwitchNavigator({
   AuthLoading: AuthLoadingScreen,
   Auth: AuthScreen,
-  App: ApplicationScreen
+  App: AppNavigator
 },
 {
   initialRouteName: 'AuthLoading'
 });
 
+/**
+ * Main container
+ */
 const MainContainer = createAppContainer(AuthNavigator);
