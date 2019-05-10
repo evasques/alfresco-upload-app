@@ -10,7 +10,6 @@ const get = async (url, headers) => {
       method: 'GET',
       headers: headers
     });
-		console.log(url + ": " + response._bodyInit);
     return JSON.parse(response._bodyInit);
   } catch (error) {
     throw new Error("An error occured doing HTTP get: " + error);
@@ -29,9 +28,8 @@ const put = async (url, headers, body) => {
     let response = await fetch(url, {
       method: 'PUT',
       headers: headers,
-      body: JSON.stringify(body)
+      body: body
     });
-		console.log(url + ": " + response._bodyInit);
     return JSON.parse(response._bodyInit);
   } catch (error) {
     throw new Error("An error occured doing HTTP put: " + error);
@@ -50,9 +48,8 @@ const post = async (url, headers, body) => {
     let response = await fetch(url, {
       method: 'POST',
       headers: headers,
-      body: JSON.stringify(body)
+      body: body
     });
-		console.log(url + ": " + response._bodyInit);
     return JSON.parse(response._bodyInit);
   } catch (error) {
     throw new Error("An error occured doing HTTP post: " + error);

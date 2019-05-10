@@ -6,10 +6,10 @@
 import React from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 import { Container, Header, Content, Form, Item, Input, Label, Button, Text } from 'native-base';
-import { AppLoading } from 'expo';
 
 // Screens
 import AbstractScreen from '@screens/AbstractScreen';
+import AlfrescoManager from '@managers/AlfrescoManager';
 
 /****************************************************************************
  * Authentication screen component
@@ -31,10 +31,10 @@ export default class AuthScreen extends AbstractScreen {
   constructor(props) {
     super(props);
 
-    this.initState({
+    this.state = {
       username: undefined,
       password: undefined
-    });
+    };
   }
 
   /**
@@ -50,9 +50,10 @@ export default class AuthScreen extends AbstractScreen {
    */
   render() {
 
-    if (this.isLoadingScreen()) {
-      return <AppLoading />;
+    if (this.state.loadingScreen) {
+      return <View />;
     }
+
 
     return (
       <Container style={styles.container}>
@@ -82,7 +83,6 @@ export default class AuthScreen extends AbstractScreen {
     *
     */
    login = () => {
-
    }
 }
 

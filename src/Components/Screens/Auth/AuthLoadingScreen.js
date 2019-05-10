@@ -67,6 +67,6 @@ export default class AuthLoadingScreen extends AbstractScreen {
    *
    */
   _isLoggedInAsync = async() => {
-    return false;
+    return true;
   }
 }
