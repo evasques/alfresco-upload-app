@@ -158,6 +158,7 @@ export default class AuthScreen extends AbstractScreen {
     */
    login = () => {
      if (!this.isLoginButtonDisabled()) {
+       // TODO Handle getTicket
        const ticket = await AlfrescoManager.getTicket(this.state.username, this.state.password);
        const isTicketValid = await AlfrescoManager.isTicketValid(ticket);
      }
