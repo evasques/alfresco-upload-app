@@ -4,6 +4,8 @@
 
 // ReactNative and external dependencies
 import React, { Component } from 'react';
+import { Spinner } from 'native-base';
+import SpinnerOverlay from 'react-native-loading-spinner-overlay';
 import { Font } from 'expo';
 
 /****************************************************************************
@@ -69,6 +71,22 @@ export default class AbstractScreen extends Component {
    /**
     *
     */
+   isLoadingAction = () => {
+     return this.state.loadingAction;
+   }
+
+   /**
+    *
+    */
+   setLoadingAction = (flag) => {
+     this.setState({
+       loadingAction: flag && flag === true
+     });
+   }
+
+   /**
+    *
+    */
    getProp = (name, defaultValue) => {
 
      let result;
@@ -100,5 +118,62 @@ export default class AbstractScreen extends Component {
    navigate = (route, params) => {
      const navigation = this.getProp('navigation');
      navigation.navigate(route, params);
+   }
+
+   /**
+    * Logouts from app
+    */
+   logout = async (cleanStore) => {
+     if (cleanStore === true) {
+       await StoreManager.delete('auth');
+     }
+     this.navigate('Auth');
+     return true;
+   }
+
+   /**
+    * Returns the Spinner component that is shown when the loading action
+    * state is true
+    *
+    * @param overlay true if spinner should overlay the screen
+    * @param props the spinner props
+    *
+    * @return the spinner component
+    */
+   getSpinner = (overlay, props) => {
+
+     let spinner;
+
+     props = props ? props : {};
+     overlay = overlay === false ? false : true;
+
+     const cancelable = props.cancelable ? props.cancelable : false;
+     const color = props.color ? props.color : 'white';
+     const animation = props.animation ? props.animation : 'none';
+     const overlayColor = props.overlayColor ? props.overlayColor : 'rgba(0, 0, 0, 0.25)';
+     const animating = true;
+     const visible = this.isLoadingAction();
+     const textStyle = props.textStyle ? props.textStyle : {};
+     const textContent = props.textContent ? props.textContent : '';
+     const style = props.style ? props.style : { flex: 1 };
+
+     if (overlay) {
+       const size = props.size ? props.size : 'large';
+
+       spinner = <SpinnerOverlay
+         cancelable={cancelable}
+         color={color}
+         animation={animation}
+         overlayColor={overlayColor}
+         visible={visible}
+         size={size}
+         textStyle={textStyle}
+         textContent={textContent} />;
+     } else {
+         const size = props.size ? props.size : 'small';
+         spinner = <Spinner color={color} />;
+     }
+
+     return spinner;
    }
 }

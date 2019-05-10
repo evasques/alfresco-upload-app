@@ -5,21 +5,23 @@
 // ReactNative and external dependencies
 import React from 'react';
 import { Platform, StyleSheet, Image, View, TouchableOpacity } from 'react-native';
-import { Container, Header, Content, Button, Text } from 'native-base';
+import { Container, Button, Text } from 'native-base';
 import { Permissions, ImagePicker, AppLoading } from 'expo';
 
 // Screens
 import AbstractScreen from '@screens/AbstractScreen';
 
-//Managers
+// Managers
 import AlfrescoManager from '@managers/AlfrescoManager';
+import StoreManager from '@managers/StoreManager';
 
 /****************************************************************************
  * Home screen component
  ***************************************************************************/
 
 /**
- *
+ * Screen where user can upload an image/video from the phone gallery to
+ * Alfresco
  */
 export default class HomeScreen extends AbstractScreen {
 
@@ -28,18 +30,19 @@ export default class HomeScreen extends AbstractScreen {
    ***************************************************************************/
 
   /**
-   *
+   * Initializes the component
    */
   constructor(props) {
     super(props);
     this.initState({
       image: undefined,
-			uri: undefined
+			uri: undefined,
+      status: undefined
     });
   }
 
   /**
-   *
+   * Loads the fonts before rendering
    */
   async componentWillMount() {
     await this.loadFontsAsync();
@@ -47,7 +50,7 @@ export default class HomeScreen extends AbstractScreen {
   }
 
   /**
-   * Renders the home screen
+   * Renders the upload screen
    */
   render() {
 
@@ -56,19 +59,30 @@ export default class HomeScreen extends AbstractScreen {
     }
 
     const hasImage = this.state.image != undefined;
+    const status = this.state.status;
+
+    const styles2 = StyleSheet.create({
+      imageborderColor: {
+        borderColor: !status ? 'black' : (status == 'error' ? 'red' : 'green')
+      }
+    });
+
+    const message = !status ? '' : (status == 'error' ? 'Error uploading image' : 'Image has been uploaded');
 
     return (
       <Container style={styles.container}>
+        {this.getSpinner()}
         <View>
           <TouchableOpacity onPress={this.chooseImage}>
             {hasImage ?
-              <Image style={styles.image} source={{ uri: this.state.uri }} /> :
-              <View style={[styles.noImage, styles.image]} />
+              <Image style={[styles.image, styles2.imageborderColor]} source={{ uri: this.state.uri }} /> :
+              <View style={[styles.noImage, styles.image, styles2.imageborderColor]} />
             }
           </TouchableOpacity>
           <Button disabled={!hasImage} onPress={this.uploadImage} style={styles.uploadImageBtn}>
             <Text>Upload image</Text>
           </Button>
+          <Text style={styles.message}>{message}</Text>
         </View>
       </Container>
     );
@@ -79,7 +93,7 @@ export default class HomeScreen extends AbstractScreen {
    ***************************************************************************/
 
   /**
-   *
+   * Allows to pick an image/video from the gallery
    */
   chooseImage = async () => {
 
@@ -98,18 +112,59 @@ export default class HomeScreen extends AbstractScreen {
 			const uri = !result.cancelled ? result.uri : undefined;
       this.setState({
         image: imageb64,
-				uri: uri
+				uri: uri,
+        status: undefined
       });
     }
   }
 
   /**
-   *
+   * Uploads the image/video to Alfresco
    */
   uploadImage = async() => {
-		const ticket = await AlfrescoManager.getTicket("test","test");
-		const isTicketValid = await AlfrescoManager.isTicketValid(ticket);
-		const nodeId = await AlfrescoManager.uploadToAlfresco(this.state.uri,this.state.image,ticket);
+
+    const upload = async () => {
+
+      let uploaded = false;
+      const json = await StoreManager.getAsync('auth');
+      let auth = json ? JSON.parse(json) : {};
+      let ticket = auth.ticket;
+      const isTicketValid = await AlfrescoManager.isTicketValid(ticket);
+
+      console.log('HomeScreen - uploadImage - ticket - ' + isTicketValid);
+
+      if (!isTicketValid) {
+        const username = auth.username;
+        const password = auth.password;
+        console.log('HomeScreen - uploadImage - credentials: ' + username + ' - ' + password);
+        if (username && password) {
+          ticket = await AlfrescoManager.getTicket(username, password);
+        } else {
+          return await this.logout(true);
+        }
+      }
+
+      if (ticket) {
+    		let nodeId;
+
+        try {
+          nodeId = await AlfrescoManager.uploadToAlfresco(this.state.uri,this.state.image,ticket);
+          console.log('HomeScreen - uploadImage - nodeId: ' + nodeId);
+          uploaded = true;
+        } catch (error) {
+          uploaded = false;
+        }
+      }
+
+      this.setState({
+        status: uploaded ? 'ok' : 'error',
+        loadingAction: false
+      });
+    };
+
+    this.setState({
+      loadingAction: true
+    }, upload);
   }
 }
 
@@ -125,18 +180,21 @@ const styles = StyleSheet.create({
   },
   noImage: {
     backgroundColor: 'lightgray',
-    borderWidth: 1,
-    borderRadius: 5,
-    borderStyle: 'dashed',
-    borderColor: 'black'
+    borderStyle: 'dashed'
   },
   image: {
     width: 300,
     height: 300,
+    borderWidth: 2,
     borderRadius: 25,
     alignSelf: 'center'
   },
   uploadImageBtn: {
+    marginTop: 50,
+    alignSelf: 'center'
+    //backgroundColor: '#ff9901'
+  },
+  message: {
     marginTop: 50,
     alignSelf: 'center'
   }

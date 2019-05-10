@@ -7,7 +7,7 @@ import { FileSystem } from 'expo';
 
 const TICKET_PARAM = "alf_ticket";
 const TYPE_CONTENT = "cm:content";
-const ALFRESCO_SERVER = "http://192.168.1.81:8080"
+const ALFRESCO_SERVER = "http://192.168.1.224:8080"
 const CONTENT_TYPE_JSON = "application/json";
 const CONTENT_TYPE_OCTET_STREAM = "application/octet-stream";
 

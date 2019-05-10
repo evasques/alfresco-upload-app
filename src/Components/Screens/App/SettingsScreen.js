@@ -5,10 +5,13 @@
 // ReactNative and external dependencies
 import React from 'react';
 import { StyleSheet } from 'react-native';
-import { Container } from 'native-base';
+import { Container, Button, Text } from 'native-base';
 
 // Screens
 import AbstractScreen from '@screens/AbstractScreen';
+
+// Managers
+import StoreManager from '@managers/StoreManager';
 
 /****************************************************************************
  * Settings screen component
@@ -36,6 +39,12 @@ export default class SettingsScreen extends AbstractScreen {
   render() {
     return (
       <Container style={styles.container}>
+        <Button  onPress={this.saveSettings} style={styles.saveSettingsBtn}>
+          <Text>Save Settings</Text>
+        </Button>
+        <Button onPress={this.logoutApp} style={styles.logoutBtn}>
+          <Text>Logout</Text>
+        </Button>
       </Container>
     );
   }
@@ -44,6 +53,12 @@ export default class SettingsScreen extends AbstractScreen {
    * Component functions
    ***************************************************************************/
 
+   /**
+    * Logouts from the app
+    */
+   logoutApp = async () => {
+     return await this.logout();
+   }
 }
 
 /****************************************************************************
@@ -52,6 +67,16 @@ export default class SettingsScreen extends AbstractScreen {
 
 const styles = StyleSheet.create({
   container: {
-
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  saveSettingsBtn: {
+    marginTop: 50,
+    alignSelf: 'center'
+  },
+  logoutBtn: {
+    marginTop: 50,
+    alignSelf: 'center'
   }
 });

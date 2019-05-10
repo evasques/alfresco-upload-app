@@ -6,14 +6,14 @@
 import React from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 import { Container, Form, Item, Input, Label, Button, Text } from 'native-base';
-import { AppLoading, SecureStore } from 'expo';
+import { AppLoading } from 'expo';
 
 // Screens
 import AbstractScreen from '@screens/AbstractScreen';
-import AlfrescoManager from '@managers/AlfrescoManager';
 
 // Managers
 import AlfrescoManager from '@managers/AlfrescoManager';
+import StoreManager from '@managers/StoreManager';
 
 /****************************************************************************
  * Authentication screen component
@@ -35,7 +35,7 @@ export default class AuthScreen extends AbstractScreen {
   constructor(props) {
     super(props);
 
-    this.state = {
+    this.initState({
       username: undefined,
       usernameInit: true,
 
@@ -50,7 +50,19 @@ export default class AuthScreen extends AbstractScreen {
    *
    */
   async componentWillMount() {
+
     await this.loadFontsAsync();
+
+    const json = await StoreManager.getAsync('auth');
+    const auth = json ? JSON.parse(json) : {};
+
+    if (auth && auth.username) {
+      this.setState({
+        username: auth.username,
+        usernameInit: true
+      });
+    }
+
     this.setLoadingScreen(false);
   }
 
@@ -62,7 +74,6 @@ export default class AuthScreen extends AbstractScreen {
     if (this.state.loadingScreen) {
       return <View />;
     }
-
 
     return (
       <Container style={styles.container}>
@@ -77,7 +88,7 @@ export default class AuthScreen extends AbstractScreen {
             <Item floatingLabel error={this.isPasswordInvalid()}>
               <Label>Password</Label>
               <Input
-                textContentType="password"
+                secureTextEntry={true}
                 onChangeText={(p) => this.onPasswordChange(p)}
                 value={this.state.password} />
             </Item>
@@ -131,11 +142,18 @@ export default class AuthScreen extends AbstractScreen {
     * Handles the password change by user input
     */
    onPasswordChange = (password) => {
-     this.setState({
+
+     let state = {
        password: password,
        passwordInit: false,
        invalid: false
-     });
+     };
+
+     if (this.hasUsername() && this.state.usernameInit == false) {
+       state.usernameInit = true;
+     }
+
+     this.setState(state);
    }
 
    /**
@@ -157,11 +175,32 @@ export default class AuthScreen extends AbstractScreen {
    /**
     * Performs the Alfresco login using supplied credentials
     */
-   login = () => {
+   login = async () => {
      if (!this.isLoginButtonDisabled()) {
-       // TODO Handle getTicket
-       const ticket = await AlfrescoManager.getTicket(this.state.username, this.state.password);
-       const isTicketValid = await AlfrescoManager.isTicketValid(ticket);
+       let ticket;
+
+       try {
+         const username = this.state.username;
+         const password = this.state.password;
+
+         ticket = await AlfrescoManager.getTicket(username, password);
+
+         const auth = {
+           username: username,
+           password: password,
+           ticket: ticket
+         };
+
+         console.log('AuthScreen - auth - ' + JSON.stringify(auth));
+
+         await StoreManager.setAsync('auth', JSON.stringify(auth));
+
+         this.navigate('App');
+       } catch (error) {
+         this.setState({
+           invalid: true
+         });
+       }
      }
    }
 }
