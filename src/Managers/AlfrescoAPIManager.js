@@ -1,5 +1,9 @@
 import HttpManager from '@managers/HttpManager';
+
 import {encode as btoa} from 'base-64';
+import { Buffer } from 'buffer'
+import { FileSystem } from 'expo';
+
 
 const TICKET_PARAM = "alf_ticket";
 const TYPE_CONTENT = "cm:content";
@@ -18,7 +22,7 @@ const login = async(username,password) => {
     password: password
 	};
 
-	return HttpManager.post(uri, _composeHeader(null,headers), body);
+	return HttpManager.post(uri, _composeHeader(null,headers), JSON.stringify(body));
 }
 
 const validateTicket = async(ticket) => {
@@ -35,21 +39,16 @@ const createContentNode = async(name,ticket) => {
 	const headers = [
 		{ name : "Content-Type", value : CONTENT_TYPE_JSON }
 	]
-	return HttpManager.post(uri, _composeHeader(ticket,headers),body);
+	return HttpManager.post(uri, _composeHeader(ticket,headers),JSON.stringify(body));
 }
 
-const uploadContentNode = async(nodeId,filePathUri,ticket) => {
+const uploadContentNode = async(nodeId,base64,ticket) => {
 	const uri = _getCoreUri("/nodes/" + nodeId + "/content");
-	/*
-	const stats = fs.statSync(filePathUri);
-	const fileSize = stats.size;
-	let readStream = fs.createReadStream(filePathUri);
-	*/
 	const headers = [
 		{ name : "Content-Type", value : CONTENT_TYPE_OCTET_STREAM },
-		{ name : "Content-length", value : fileSize },
 	]
-	//return HttpManager.post(uri, _composeHeader(ticket,headers), readStream);
+	const content = new Buffer.from( base64, 'base64');
+	return HttpManager.put(uri, _composeHeader(ticket,headers), content);
 }
 
 
@@ -62,7 +61,6 @@ _getCoreUri = (uri,ticket) => {
 }
 
 _composeHeader = (ticket,headers) => {
-	console.log("TICKET: " + ticket);
 	let finalHeaders = {};
 	if(headers){
 		headers.forEach(header => {
@@ -74,13 +72,12 @@ _composeHeader = (ticket,headers) => {
 	}
 	finalHeaders.Accept = CONTENT_TYPE_JSON;
 
-	console.log("Headers: " + JSON.stringify(finalHeaders));
-
 	return finalHeaders;
 }
 
 export default {
   login,
 	validateTicket,
-	createContentNode
+	createContentNode,
+	uploadContentNode
 }

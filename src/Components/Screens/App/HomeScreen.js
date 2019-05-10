@@ -11,6 +11,9 @@ import { Permissions, ImagePicker, AppLoading } from 'expo';
 // Screens
 import AbstractScreen from '@screens/AbstractScreen';
 
+//Managers
+import AlfrescoManager from '@managers/AlfrescoManager';
+
 /****************************************************************************
  * Home screen component
  ***************************************************************************/
@@ -30,7 +33,8 @@ export default class HomeScreen extends AbstractScreen {
   constructor(props) {
     super(props);
     this.initState({
-      image: undefined
+      image: undefined,
+			uri: undefined
     });
   }
 
@@ -58,7 +62,7 @@ export default class HomeScreen extends AbstractScreen {
         <View>
           <TouchableOpacity onPress={this.chooseImage}>
             {hasImage ?
-              <Image style={styles.image} source={{ uri: this.state.image }} /> :
+              <Image style={styles.image} source={{ uri: this.state.uri }} /> :
               <View style={[styles.noImage, styles.image]} />
             }
           </TouchableOpacity>
@@ -87,10 +91,14 @@ export default class HomeScreen extends AbstractScreen {
     }
 
     if (hasPermission) {
-      const result = await ImagePicker.launchImageLibraryAsync();
-      const uri = !result.cancelled ? result.uri : undefined;
+      const result = await ImagePicker.launchImageLibraryAsync({
+				base64 : true
+			});
+      const imageb64 = !result.cancelled ? result.base64 : undefined;
+			const uri = !result.cancelled ? result.uri : undefined;
       this.setState({
-        image: uri
+        image: imageb64,
+				uri: uri
       });
     }
   }
@@ -98,8 +106,10 @@ export default class HomeScreen extends AbstractScreen {
   /**
    *
    */
-  uploadImage = () => {
-
+  uploadImage = async() => {
+		const ticket = await AlfrescoManager.getTicket("test","test");
+		const isTicketValid = await AlfrescoManager.isTicketValid(ticket);
+		const nodeId = await AlfrescoManager.uploadToAlfresco(this.state.uri,this.state.image,ticket);
   }
 }
 

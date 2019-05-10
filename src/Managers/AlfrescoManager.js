@@ -20,15 +20,23 @@ const isTicketValid = async(ticket) => {
 	return false;
 }
 
-const uploadToAlfresco = async(filePathUri,ticket) => {
+const uploadToAlfresco = async(filePathUri,base64,ticket) => {
 	const filename = path.basename(filePathUri);
-	const apiResponse = await API.createContentNode(filename,ticket);
-	let nodeId = "";
-	if(apiResponse.entry){
-		nodeId = apiResponse.entry.id;
+	const createNodeResponse = await API.createContentNode(filename,ticket);
+	if(createNodeResponse.entry){
+		let nodeId = createNodeResponse.entry.id;
+		const uploadNodeResponse = await API.uploadContentNode(nodeId,base64,ticket);
+
+		if(uploadNodeResponse.entry){
+			return createNodeResponse.entry.id;
+		}
+		if(uploadNodeResponse.error){
+			throw new Error(createNodeResponse.error.briefSummary);
+		}
+
 	}
-	if(apiResponse.error){
-		throw new Error(apiResponse.error.briefSummary);
+	if(createNodeResponse.error){
+		throw new Error(createNodeResponse.error.briefSummary);
 	}
 }
 

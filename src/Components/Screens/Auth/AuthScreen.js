@@ -10,6 +10,7 @@ import { AppLoading, SecureStore } from 'expo';
 
 // Screens
 import AbstractScreen from '@screens/AbstractScreen';
+import AlfrescoManager from '@managers/AlfrescoManager';
 
 // Managers
 import AlfrescoManager from '@managers/AlfrescoManager';
@@ -34,7 +35,7 @@ export default class AuthScreen extends AbstractScreen {
   constructor(props) {
     super(props);
 
-    this.initState({
+    this.state = {
       username: undefined,
       usernameInit: true,
 
@@ -58,8 +59,8 @@ export default class AuthScreen extends AbstractScreen {
    */
   render() {
 
-    if (this.isLoadingScreen()) {
-      return <AppLoading />;
+    if (this.state.loadingScreen) {
+      return <View />;
     }
 
 
