@@ -1,10 +1,14 @@
 /****************************************************************************
- * Imports
+ * Imports, variables, constants
  ***************************************************************************/
 
+// ReactNative and external dependencies
 import React from 'react';
 import { View } from 'react-native';
 import { SecureStore } from 'expo';
+
+// Screens
+import AbstractScreen from '@screens/AbstractScreen';
 
 /****************************************************************************
  * Authentication loading component
@@ -13,7 +17,7 @@ import { SecureStore } from 'expo';
 /**
  *
  */
-export default class AuthLoadingScreen extends BaseScreen {
+export default class AuthLoadingScreen extends AbstractScreen {
 
   /****************************************************************************
    * Component Lifecycle
@@ -56,12 +60,13 @@ export default class AuthLoadingScreen extends BaseScreen {
       route = 'App';
     }
 
-    this._navigate(route);
+    this.props.navigation.navigate(route);
   };
 
   /**
    *
    */
   _isLoggedInAsync = async() => {
+    return false;
   }
 }

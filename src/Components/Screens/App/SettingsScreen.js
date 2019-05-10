@@ -4,67 +4,38 @@
 
 // ReactNative and external dependencies
 import React from 'react';
-import { View, Image, StyleSheet } from 'react-native';
-import { Container, Header, Content, Form, Item, Input, Label, Button, Text } from 'native-base';
+import { StyleSheet } from 'react-native';
+import { Container } from 'native-base';
 
 // Screens
 import AbstractScreen from '@screens/AbstractScreen';
 
 /****************************************************************************
- * Authentication screen component
+ * Settings screen component
  ***************************************************************************/
 
 /**
- * Authentication component which allows the user to access the application
- * using a social network login button
+ *
  */
-export default class AuthScreen extends AbstractScreen {
+export default class SettingsScreen extends AbstractScreen {
 
   /****************************************************************************
    * Component Lifecycle
    ***************************************************************************/
 
   /**
-   * Initializes the screen state
+   *
    */
   constructor(props) {
     super(props);
   }
 
   /**
-   *
-   */
-  async componentWillMount() {
-    await this.loadFontsAsync();
-    this.setLoadingScreen(false);
-  }
-
-  /**
-   * Renders the login screen
+   * Renders the settings screen
    */
   render() {
-
-    if (this.state.loadingScreen) {
-      return <View />;
-    }
-
-
     return (
       <Container style={styles.container}>
-        <Header style={styles.header} />
-        <Content>
-          <Form>
-            <Item floatingLabel>
-              <Label>Username</Label>
-              <Input />
-            </Item>
-            <Item floatingLabel>
-              <Label>Password</Label>
-              <Input />
-            </Item>
-            <Button><Text>Login</Text></Button>
-          </Form>
-        </Content>
       </Container>
     );
   }
@@ -73,19 +44,14 @@ export default class AuthScreen extends AbstractScreen {
    * Component functions
    ***************************************************************************/
 
-
 }
 
 /****************************************************************************
  * Styles
  ***************************************************************************/
 
- const styles = StyleSheet.create({
-   container: {
-     backgroundColor: '#ffffff'
-   },
-   header: {
-     backgroundColor: '#ffffff',
-     height: 200
-   }
- });
+const styles = StyleSheet.create({
+  container: {
+
+  }
+});
