@@ -1,8 +1,9 @@
-const api = require('./AlfrescoAPIManager');
+import API from '@managers/AlfrescoAPIManager';
+
 const path = require('path');
 
 const getTicket = async(username,password) => {
-	const apiResponse = await api.login(username,password);
+	const apiResponse = await API.login(username,password);
 	if(apiResponse.entry){
 		return apiResponse.entry.id;
 	}
@@ -12,16 +13,16 @@ const getTicket = async(username,password) => {
 }
 
 const isTicketValid = async(ticket) => {
-	const apiResponse = api.validateTicket(ticket);
+	const apiResponse = await API.validateTicket(ticket);
 	if(apiResponse.entry){
 		return true;
 	}
 	return false;
 }
 
-const uploadToAlfresco = async(ticket,filePathUri) => {
+const uploadToAlfresco = async(filePathUri,ticket) => {
 	const filename = path.basename(filePathUri);
-	const apiResponse = api.createContentNode(filename,ticket);
+	const apiResponse = await API.createContentNode(filename,ticket);
 	let nodeId = "";
 	if(apiResponse.entry){
 		nodeId = apiResponse.entry.id;
