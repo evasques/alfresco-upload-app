@@ -35,7 +35,7 @@ export default class AbstractScreen extends Component {
        'Roboto': require("native-base/Fonts/Roboto.ttf"),
        'Roboto_medium': require("native-base/Fonts/Roboto_medium.ttf"),
        'Ionicons': require("@expo/vector-icons/fonts/Ionicons.ttf"),
-       'Feather': require("@expo/vector-icons/fonts/Feather.ttf")
+       'AntDesign': require("@expo/vector-icons/fonts/AntDesign.ttf")
      });
    }
 

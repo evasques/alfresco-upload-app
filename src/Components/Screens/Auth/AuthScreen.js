@@ -29,6 +29,11 @@ export default class AuthScreen extends AbstractScreen {
    */
   constructor(props) {
     super(props);
+
+    this.state = {
+      username: undefined,
+      password: undefined
+    };
   }
 
   /**
@@ -62,7 +67,7 @@ export default class AuthScreen extends AbstractScreen {
               <Label>Password</Label>
               <Input />
             </Item>
-            <Button><Text>Login</Text></Button>
+            <Button onPress={this.login}><Text>Login</Text></Button>
           </Form>
         </Content>
       </Container>
@@ -73,7 +78,12 @@ export default class AuthScreen extends AbstractScreen {
    * Component functions
    ***************************************************************************/
 
+   /**
+    *
+    */
+   login = () => {
 
+   }
 }
 
 /****************************************************************************

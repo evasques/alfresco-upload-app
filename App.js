@@ -5,6 +5,7 @@
 // ReactNative and external dependencies
 import React, { Component } from 'react';
 import { Platform } from 'react-native';
+import { Icon } from 'native-base';
 import { createAppContainer, createSwitchNavigator, createBottomTabNavigator } from 'react-navigation';
 
 // Screens
@@ -43,7 +44,7 @@ const AppNavigator = createBottomTabNavigator({
      screen: HomeScreen,
      navigationOptions: ({ navigation }) => ({
        tabBarIcon: ({ tintColor }) => (
-           <Icon name='home' type='Feather' style={{ fontSize: iconSize, color: tintColor }} />
+           <Icon name='home' type='AntDesign' style={{ color: tintColor }} />
        )
      })
    },
@@ -53,7 +54,7 @@ const AppNavigator = createBottomTabNavigator({
      screen: SettingsScreen,
      navigationOptions: ({ navigation }) => ({
        tabBarIcon: ({ tintColor }) => (
-           <Icon name='hash' type='Feather' style={{ fontSize: iconSize, color: tintColor }} />
+           <Icon name='setting' type='AntDesign' style={{ color: tintColor }} />
        )
      })
    }
