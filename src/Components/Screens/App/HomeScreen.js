@@ -46,7 +46,7 @@ export default class HomeScreen extends AbstractScreen {
    */
   async componentWillMount() {
     await this.loadFontsAsync();
-    this.setLoadingScreen(false);
+    this.setState({ loadingScreen: false });
   }
 
   /**
@@ -123,7 +123,7 @@ export default class HomeScreen extends AbstractScreen {
    */
   uploadImage = async() => {
 
-    const upload = async () => {
+    const uploadCallback = async () => {
 
       let uploaded = false;
       const json = await StoreManager.getAsync('auth');
@@ -164,7 +164,7 @@ export default class HomeScreen extends AbstractScreen {
 
     this.setState({
       loadingAction: true
-    }, upload);
+    }, uploadCallback);
   }
 }
 

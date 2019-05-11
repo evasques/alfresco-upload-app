@@ -7,6 +7,7 @@ import React from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 import { Container, Form, Item, Input, Label, Button, Text } from 'native-base';
 import { AppLoading } from 'expo';
+import { NavigationEvents } from 'react-navigation';
 
 // Screens
 import AbstractScreen from '@screens/AbstractScreen';
@@ -36,12 +37,12 @@ export default class AuthScreen extends AbstractScreen {
     super(props);
 
     this.initState({
+      address: undefined,
+      addressInit: true,
       username: undefined,
       usernameInit: true,
-
       password: undefined,
       passwordInit: true,
-
       invalid: false
     });
   }
@@ -50,20 +51,8 @@ export default class AuthScreen extends AbstractScreen {
    *
    */
   async componentWillMount() {
-
     await this.loadFontsAsync();
-
-    const json = await StoreManager.getAsync('auth');
-    const auth = json ? JSON.parse(json) : {};
-
-    if (auth && auth.username) {
-      this.setState({
-        username: auth.username,
-        usernameInit: true
-      });
-    }
-
-    this.setLoadingScreen(false);
+    await this.fillData();
   }
 
   /**
@@ -77,8 +66,15 @@ export default class AuthScreen extends AbstractScreen {
 
     return (
       <Container style={styles.container}>
+          {this.getSpinner()}
           <Image source={{ uri: alfrescoLogo }} style={styles.logo} />
           <Form>
+            <Item floatingLabel error={this.isAddressInvalid()}>
+              <Label>Address</Label>
+              <Input
+                onChangeText={(a) => this.onAddressChange(a)}
+                value={this.state.address} />
+            </Item>
             <Item floatingLabel error={this.isUsernameInvalid()}>
               <Label>Username</Label>
               <Input
@@ -96,6 +92,11 @@ export default class AuthScreen extends AbstractScreen {
               <Text>Login</Text>
             </Button>
           </Form>
+          <NavigationEvents
+            onWillFocus={async(payload) => {
+              await this.fillData();
+            }}
+          />
       </Container>
     );
   }
@@ -103,6 +104,57 @@ export default class AuthScreen extends AbstractScreen {
   /****************************************************************************
    * Component functions
    ***************************************************************************/
+
+   /**
+    * Fills the auth screen with existing data (if any)
+    */
+   fillData = async () => {
+
+     const json = await StoreManager.getAsync('auth');
+     const auth = json ? JSON.parse(json) : {};
+
+     if (auth) {
+       this.setState({
+         address: auth.address,
+         addressInit: false,
+         username: auth.username,
+         usernameInit: false,
+         loadingScreen: false
+       });
+     } else {
+       this.setState({
+         loadingScreen: false
+       });
+     }
+   }
+
+   /**
+    * Checks if there is an address
+    */
+   hasAddress = () => {
+     return (this.state.address || this.state.addressInit ? true : false);
+   }
+
+   /**
+    * Handles the address change by user input
+    */
+   onAddressChange = (address) => {
+     this.setState({
+       address: address,
+       addressInit: false,
+       invalid: false
+     });
+   }
+
+   /**
+    * Checks if the current address is invalid
+    *
+    * @return true if address is invalid, false if is valid
+    */
+   isAddressInvalid = () => {
+     return !this.hasAddress() || this.state.invalid === true;
+   }
+
 
    /**
     * Checks if there is an username
@@ -123,7 +175,7 @@ export default class AuthScreen extends AbstractScreen {
    }
 
    /**
-    * Checks if the supplied username is invalid
+    * Checks if the current username is invalid
     *
     * @return true if username is invalid, false if is valid
     */
@@ -142,22 +194,15 @@ export default class AuthScreen extends AbstractScreen {
     * Handles the password change by user input
     */
    onPasswordChange = (password) => {
-
-     let state = {
+     this.setState({
        password: password,
        passwordInit: false,
        invalid: false
-     };
-
-     if (this.hasUsername() && this.state.usernameInit == false) {
-       state.usernameInit = true;
-     }
-
-     this.setState(state);
+     });
    }
 
    /**
-    * Checks if the supplied password is invalid
+    * Checks if the current password is invalid
     *
     * @return true if password is invalid, false if is valid
     */
@@ -169,7 +214,10 @@ export default class AuthScreen extends AbstractScreen {
     * Checks wether the login button should be disabled or not
     */
    isLoginButtonDisabled = () => {
-     return !this.hasUsername() || !this.hasPassword() || (this.state.usernameInit === true || this.state.passwordInit === true);
+     return !this.hasAddress() ||
+        !this.hasUsername() ||
+        !this.hasPassword() ||
+        (this.state.addressInit === true || this.state.usernameInit === true || this.state.passwordInit === true);
    }
 
    /**
@@ -177,30 +225,51 @@ export default class AuthScreen extends AbstractScreen {
     */
    login = async () => {
      if (!this.isLoginButtonDisabled()) {
-       let ticket;
 
-       try {
-         const username = this.state.username;
-         const password = this.state.password;
+       const loginCallback = async () => {
 
-         ticket = await AlfrescoManager.getTicket(username, password);
+         let ticket;
+         let loggedIn = false;
 
-         const auth = {
-           username: username,
-           password: password,
-           ticket: ticket
-         };
+         try {
+           const address = this.state.address;
+           const username = this.state.username;
+           const password = this.state.password;
 
-         console.log('AuthScreen - auth - ' + JSON.stringify(auth));
+           // Sets Alfresco address
+           AlfrescoManager.setAddress(address);
 
-         await StoreManager.setAsync('auth', JSON.stringify(auth));
+           ticket = await AlfrescoManager.getTicket(username, password);
 
-         this.navigate('App');
-       } catch (error) {
-         this.setState({
-           invalid: true
-         });
+           const auth = {
+             address: address,
+             username: username,
+             password: password,
+             ticket: ticket
+           };
+
+           console.log('AuthScreen - auth - ' + JSON.stringify(auth));
+
+           await StoreManager.setAsync('auth', JSON.stringify(auth));
+
+           loggedIn = true;
+         } catch (error) {
+           loggedIn = false;
+         } finally {
+           this.setState({
+             loadingAction: false,
+             invalid: !loggedIn
+           }, () => {
+             if (loggedIn) {
+               this.navigate('App');
+             }
+           });
+         }
        }
+
+       this.setState({
+         loadingAction: true
+       }, loginCallback);
      }
    }
 }

@@ -77,28 +77,34 @@ export default class AuthLoadingScreen extends AbstractScreen {
     const json = await StoreManager.getAsync('auth');
     let auth = json ? JSON.parse(json) : {};
     let ticket = auth.ticket;
+    const address = auth.address;
 
-    if (ticket) {
-      const isTicketValid = await AlfrescoManager.isTicketValid(ticket);
-      if (isTicketValid) {
-        hasValidTicket = true;
-      } else {
-        ticket = undefined;
-      }
-    }
+    if (address) {
+      // Sets Alfresco address
+      AlfrescoManager.setAddress(address);
 
-    if (!ticket) {
-      const username = auth.username;
-      const password = auth.password;
-
-      if (username && password) {
-        try {
-          ticket = await AlfrescoManager.getTicket(username, password);
-          auth.ticket = ticket;
-          await StoreManager.setAsync('auth', JSON.stringify(auth));
+      if (ticket) {
+        const isTicketValid = await AlfrescoManager.isTicketValid(ticket);
+        if (isTicketValid) {
           hasValidTicket = true;
-        } catch (error) {
-          console.log('AuthLoadingScreen - Error obtaining ticket: ' + error);
+        } else {
+          ticket = undefined;
+        }
+      }
+
+      if (!ticket) {
+        const username = auth.username;
+        const password = auth.password;
+
+        if (username && password) {
+          try {
+            ticket = await AlfrescoManager.getTicket(username, password);
+            auth.ticket = ticket;
+            await StoreManager.setAsync('auth', JSON.stringify(auth));
+            hasValidTicket = true;
+          } catch (error) {
+            console.log('AuthLoadingScreen - Error obtaining ticket: ' + error);
+          }
         }
       }
     }

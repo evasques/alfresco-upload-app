@@ -3,11 +3,18 @@ import API from '@managers/AlfrescoAPIManager';
 const path = require('path');
 
 /**
+ * Configures the Alfresco address
+ */
+const setAddress = (address) => {
+	API.setAddress(address);
+}
+
+/**
  * Obtains an Alfresco ticket for supplied credentials
  */
 const getTicket = async (username, password) => {
 
-	const apiResponse = await API.login(username,password);
+	const apiResponse = await API.login(username, password);
 
 	if (apiResponse.entry) {
 		return apiResponse.entry.id;
@@ -63,6 +70,7 @@ const uploadToAlfresco = async (filePathUri, base64, ticket) => {
  * Expose functions
  */
 export default {
+	setAddress,
   getTicket,
 	isTicketValid,
 	uploadToAlfresco

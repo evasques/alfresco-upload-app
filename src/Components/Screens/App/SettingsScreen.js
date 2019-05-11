@@ -10,15 +10,15 @@ import { Container, Button, Text } from 'native-base';
 // Screens
 import AbstractScreen from '@screens/AbstractScreen';
 
-// Managers
-import StoreManager from '@managers/StoreManager';
-
 /****************************************************************************
  * Settings screen component
  ***************************************************************************/
 
 /**
+ * Application settings
  *
+ * NOTE:
+ * In future can be used to change parameters without the need of logging out
  */
 export default class SettingsScreen extends AbstractScreen {
 
@@ -27,7 +27,7 @@ export default class SettingsScreen extends AbstractScreen {
    ***************************************************************************/
 
   /**
-   *
+   * Initializes the component
    */
   constructor(props) {
     super(props);
@@ -39,9 +39,6 @@ export default class SettingsScreen extends AbstractScreen {
   render() {
     return (
       <Container style={styles.container}>
-        <Button  onPress={this.saveSettings} style={styles.saveSettingsBtn}>
-          <Text>Save Settings</Text>
-        </Button>
         <Button onPress={this.logoutApp} style={styles.logoutBtn}>
           <Text>Logout</Text>
         </Button>
@@ -70,10 +67,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center'
-  },
-  saveSettingsBtn: {
-    marginTop: 50,
-    alignSelf: 'center'
   },
   logoutBtn: {
     marginTop: 50,

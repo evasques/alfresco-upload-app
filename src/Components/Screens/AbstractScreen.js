@@ -8,6 +8,9 @@ import { Spinner } from 'native-base';
 import SpinnerOverlay from 'react-native-loading-spinner-overlay';
 import { Font } from 'expo';
 
+// Managers
+import StoreManager from '@managers/StoreManager';
+
 /****************************************************************************
  * Abstract screen component
  ***************************************************************************/
@@ -51,7 +54,6 @@ export default class AbstractScreen extends Component {
      });
    }
 
-
    /**
     *
     */
@@ -62,26 +64,8 @@ export default class AbstractScreen extends Component {
    /**
     *
     */
-   setLoadingScreen = (flag) => {
-     this.setState({
-       loadingScreen: flag && flag === true
-     });
-   }
-
-   /**
-    *
-    */
    isLoadingAction = () => {
      return this.state.loadingAction;
-   }
-
-   /**
-    *
-    */
-   setLoadingAction = (flag) => {
-     this.setState({
-       loadingAction: flag && flag === true
-     });
    }
 
    /**
@@ -125,7 +109,13 @@ export default class AbstractScreen extends Component {
     */
    logout = async (cleanStore) => {
      if (cleanStore === true) {
-       await StoreManager.delete('auth');
+       await StoreManager.deleteAsync('auth');
+     } else {
+       const json = await StoreManager.getAsync('auth');
+       let auth = json ? JSON.parse(json) : {};
+       delete auth.ticket;
+       delete auth.password;
+       await StoreManager.setAsync('auth', JSON.stringify(auth));
      }
      this.navigate('Auth');
      return true;
